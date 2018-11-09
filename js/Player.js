@@ -97,7 +97,8 @@ function Player(x=0, y=0, r=10, color='black', id=random(100,400))
         
         ctx.fillStyle = tmp;//red
         draw_vector(this.position.x, this.position.y, this.speed*5);
-        ctx.fillText(this.speed, this.position.x-2,this.position.y-30);
+
+        ctx.fillText(this.velocity.length(), this.position.x-2,this.position.y-30);
     }
     
     this.update = function(){
@@ -128,14 +129,15 @@ function Player(x=0, y=0, r=10, color='black', id=random(100,400))
                 ).unit(1);
                 
                 //this is variable used for speed of our player
-                let speedy = diff.scale(6).length();
+                //use diff not diff2
+                let speedy = diff2.scale(1000).length();
                 
                 //decresed speed by direction diff 
                 //this will slow down player when sudenly chaning direction
                 //need some tweeks
                 // 90deg vs 100deg
                 // idk
-                speedy /= Math.abs(dir2-dir1)*2;//diff2.scale(200).length();
+                speedy /= Math.abs(dir2-dir1);//diff2.scale(200).length();
                 
                 /*
                 //these are commented becuse they also work haha
@@ -157,11 +159,12 @@ function Player(x=0, y=0, r=10, color='black', id=random(100,400))
                 */
                 
                 //if mouse is outside of the circle minspeed
-                if(diff.length() > minSpeedR-10)
+                if(diff.length() > minSpeedR)
                 {
                     //we change our speed by speedy and some random value
                     //really i don't know physics behind this but it's work fine for me
-                    this.speed = lerp(this.speed, Math.min(speedy/minSpeedR, 15), .1);
+                    this.speed = lerp(this.speed, Math.min(speedy/(minSpeedR), 15), .1);
+
                     
                     //change current velocity direction*speed;
                     this.velocity = this.direction.scale(this.speed);
@@ -170,7 +173,7 @@ function Player(x=0, y=0, r=10, color='black', id=random(100,400))
                 //change postion
                 this.position = this.position.add(this.velocity);
                 
-                if(this.velocity.length()>1)
+                if(this.velocity.length()>5)
                 {
                     if(this.particles.length<15)
                     {

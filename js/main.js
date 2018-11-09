@@ -4,7 +4,7 @@ let ctx = canvas.getContext('2d');
 let width = canvas.width = 820;
 let height = canvas.height = width*3/4;
 
-let room = new Vec2d(1000, 1000);
+let room = new Vec2d(6000, 6000);
 /* let viewPort = {
     position:new Vec2d(0,0),
     widthHeight:new Vec2d(width, height)
@@ -22,13 +22,16 @@ let players = [];
 
 let DefaultRadius = 20;
 
-players.push( new Player(100,100,DefaultRadius, 'red') );
-players.push( new Player(100,600,DefaultRadius, 'blue') );
-players.push( new Player(600,100,DefaultRadius, 'gray') );
-players.push( new Player(600,600,DefaultRadius, 'pink') );
-players.push( new Player(1200,100,DefaultRadius, 'purple') );
+let scaleFact = 1;
 
-let player = new Player(70, 70, DefaultRadius,'orange');
+for(i=0;i<30;i++){
+    players.push( new Player(random(0, room.x),random(0, room.y),DefaultRadius, 'red') );
+    players.push( new Player(random(0, room.x),random(0, room.y), 'blue') );
+    players.push( new Player(random(0, room.x),random(0, room.y), 'gray') );
+    players.push( new Player(random(0, room.x),random(0, room.y), 'pink') );
+    players.push( new Player(random(0, room.x),random(0, room.y), 'purple') );
+}
+let player = new Player(room.x/2, room.y/2, DefaultRadius,'orange');
 
 let minSpeedR = 50;
 
@@ -36,6 +39,7 @@ function update()
 {
     
     mouse.set(mouseTarget.x - viewPort.x, mouseTarget.y - viewPort.y);
+    
     
     player.update();
     
@@ -66,11 +70,18 @@ function draw()
     //save current state of canvas transform
     ctx.save();
     
+    
+    
     let tx = width/2-player.position.x;
     let ty = height/2-player.position.y;
     
-    viewPort.x = lerp(viewPort.x, tx, 1/20);
-    viewPort.y = lerp(viewPort.y, ty, 1/20);
+    if(false){
+        viewPort.x = lerp(viewPort.x, tx, 1/20);
+        viewPort.y = lerp(viewPort.y, ty, 1/20);
+    }else{
+        viewPort.x = tx;
+        viewPort.y = ty;
+    }
     
     /* 
     if(player.position.x < width/2)
@@ -83,9 +94,11 @@ function draw()
     }
     */
     
-    ctx.translate(viewPort.x, viewPort.y);
     
-    // let scaleFact = DefaultRadius/player.r;
+    ctx.scale(scaleFact, scaleFact);
+    ctx.translate(viewPort.x+(width-width*scaleFact), viewPort.y+(height-height*scaleFact));
+    
+    
     // ctx.scale(scaleFact, scaleFact);
     
     
@@ -137,8 +150,8 @@ window.onmousemove = function(evt)
     //comment this to see effect
     // mouse.set(evt.clientX, evt.clientY);
     mouseTarget.set(
-        evt.clientX /* - viewPort.x */,
-        evt.clientY /* - viewPort.y */
+        evt.clientX/scaleFact/* - viewPort.x */,
+        evt.clientY/scaleFact/* - viewPort.y */
         );
     }
     
