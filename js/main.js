@@ -30,7 +30,7 @@ players.push( new Player(1200,100,DefaultRadius, 'purple') );
 
 let player = new Player(70, 70, DefaultRadius,'orange');
 
-let minSpeedR = 100;
+let minSpeedR = 50;
 
 function update()
 {
