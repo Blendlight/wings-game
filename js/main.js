@@ -22,7 +22,7 @@ let players = [];
 
 let DefaultRadius = 20;
 
-let scaleFact = 1;
+let scaleFact = .8;
 
 for(i=0;i<30;i++){
     players.push( new Player(random(0, room.x),random(0, room.y),DefaultRadius, 'red') );
@@ -150,8 +150,8 @@ window.onmousemove = function(evt)
     //comment this to see effect
     // mouse.set(evt.clientX, evt.clientY);
     mouseTarget.set(
-        evt.clientX/scaleFact/* - viewPort.x */,
-        evt.clientY/scaleFact/* - viewPort.y */
+        evt.clientX/scaleFact - (width-width*scaleFact) /* - viewPort.x */,
+        evt.clientY/scaleFact - (height-height*scaleFact) /* - viewPort.y */
         );
     }
     

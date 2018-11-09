@@ -1,4 +1,4 @@
-function particle(x,y,r,xv=0,yv=0, fac=0.9)
+function particle(x,y,r,xv=0,yv=0, fac=0.8)
 {
     this.position = new Vec2d(x, y);
     this.velocity = new Vec2d(xv, yv);
@@ -38,12 +38,13 @@ function Player(x=0, y=0, r=10, color='black', id=random(100,400))
         ctx.fillStyle = this.color;//blue
         
         
+        // ============ Draw particles
         
         let pp = null;
         let tmpWidth = ctx.lineWidth;
         for(part of this.particles)
         {
-            // part.draw();
+            
             if(pp!=null)
             {
                 ctx.lineWidth = part.r;
@@ -53,10 +54,13 @@ function Player(x=0, y=0, r=10, color='black', id=random(100,400))
                 ctx.lineWidth = last.r;
                 draw_line(this.position.x, this.position.y, last.position.x, last.position.y);
             }
-            
             pp = part;
         }
         ctx.lineWidth = tmpWidth;
+        
+        //====end of Draw paritcles
+        
+        
         
         {
             // draw_cicle(this.position.x, this.position.y, this.r);
@@ -97,13 +101,11 @@ function Player(x=0, y=0, r=10, color='black', id=random(100,400))
         
         ctx.fillStyle = tmp;//red
         draw_vector(this.position.x, this.position.y, this.speed*5);
-
+        
         ctx.fillText(this.velocity.length(), this.position.x-2,this.position.y-30);
     }
     
-    this.update = function(){
-        
-        
+    this.update = function(){   
         {
             
             //slow down the velocity
@@ -130,45 +132,65 @@ function Player(x=0, y=0, r=10, color='black', id=random(100,400))
                 
                 //this is variable used for speed of our player
                 //use diff not diff2
-                let speedy = diff2.scale(1000).length();
+                let speedy = diff.length();
                 
                 //decresed speed by direction diff 
                 //this will slow down player when sudenly chaning direction
                 //need some tweeks
                 // 90deg vs 100deg
                 // idk
-                speedy /= Math.abs(dir2-dir1);//diff2.scale(200).length();
-                
-                /*
-                //these are commented becuse they also work haha
-                
-                // let dir = diff.direction();
-                // let dir2 = this.direction.direction();
-                
-                // dir = lerp(dir, dir2, .1);
-                
-                // let newDir = new Vec2d(Math.cos(dir), Math.sin(dir));
-                // let ddd = newDir.subtract(this.direction);
-                // this.direction = this.direction.lerp(newDir,1/Math.min(15, Math.max(ddd.length()+2, 10)));
-                // // this.direction = this.direction.unit();
-                // this.direction = new Vec2d(Math.cos(dir), Math.sin(dir));
-                // // this.direction = this.direction.scale(1);
-                
-                // this.direction = this.direction.lerp(newDir, 1); 
-                
-                */
+                //speedy /= Math.abs(dir2-dir1);//diff2.scale(200).length();
                 
                 //if mouse is outside of the circle minspeed
                 if(diff.length() > minSpeedR)
                 {
                     //we change our speed by speedy and some random value
                     //really i don't know physics behind this but it's work fine for me
-                    this.speed = lerp(this.speed, Math.min(speedy/(minSpeedR), 15), .1);
+                    // this.speed = lerp(this.speed, Math.min(speedy/(minSpeedR), 15), .1);
+                    let nspeed = Math.min(speedy/20, 20);
+                    
+                    this.speed = lerp(this.speed, nspeed, .08);
 
+                    //deceress speed if changing direction is greater then 20
+                    if(radian2degrees(Math.abs(dir1-dir2)) > 20)
+                    {
+                        this.speed *= .98;
+                    }
+                    
+                    this.velocity = this.direction.scale(this.speed);
+                    //this is for solving lerp problem
+                    
                     
                     //change current velocity direction*speed;
-                    this.velocity = this.direction.scale(this.speed);
+                    // let moveVec = this.direction.scale(this.speed);
+                    // this.velocity = this.velocity.lerp(moveVec, .11);
                 }
+                
+                // this.velocity = this.velocity.lerp(zeroVec, .1);
+                
+                
+                
+                
+                //skip aboce use below
+                if(false){
+                    // if(mouse_clicked == true)
+                    let diff = mouse.subtract(this.position);
+                    let speed = Math.min(diff.length()/30, 10);
+                    
+                    if(diff.length() > minSpeedR-10)
+                    {
+                        moveVec = diff.unit(speed);//length 10;
+                        // this.velocity.x += lerp(this.velocity.x, unitVect.x, .1);
+                        // this.velocity.y += lerp(this.velocity.y, unitVect.y, .1);
+                        this.velocity = this.velocity.lerp(moveVec, .1);
+                        
+                    }else{
+                        this.velocity = this.velocity.lerp(zeroVec, .1)
+                    }
+                    
+                    this.direction = this.velocity.unit();
+                }
+                //endof skip above use below
                 
                 //change postion
                 this.position = this.position.add(this.velocity);
@@ -177,7 +199,7 @@ function Player(x=0, y=0, r=10, color='black', id=random(100,400))
                 {
                     if(this.particles.length<15)
                     {
-                        this.particles.push(new particle(this.position.x, this.position.y, this.velocity.length(), -player.velocity.x, -player.velocity.y));
+                        this.particles.push(new particle(this.position.x, this.position.y, this.velocity.length()/2, -player.velocity.x, -player.velocity.y));
                     }
                 }
                 
@@ -185,7 +207,7 @@ function Player(x=0, y=0, r=10, color='black', id=random(100,400))
                 for(part of this.particles)
                 {
                     part.update();
-                    if(part.r>=0.9)
+                    if(part.r>=.9)
                     {
                         newParticles.push(part);
                     }
